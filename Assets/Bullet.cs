@@ -34,8 +34,9 @@ public class Bullet : MonoBehaviour
             collision.gameObject.GetComponent<Enemy>().gethit(Direction,speed);
             GameObject Player = GameObject.FindGameObjectWithTag("Player");
             Player.GetComponent<Player>().score++;
-            Destroy(gameObject);
+            
         }
+        Destroy(gameObject);
     }
 
 }

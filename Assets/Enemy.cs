@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public float gethittime;
     Rigidbody2D Rigidbody;
+
     void Start()
     {
         health = 10;
