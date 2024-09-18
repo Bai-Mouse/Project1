@@ -391,7 +391,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 6
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -410,7 +410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.3
-  jumpforce: 15
+  jumpforce: 20
   score: 0
   gun: {fileID: 1854563180}
   bullet: {fileID: 3507522208108484542, guid: c77a4109d16ff9040811cc0bd9b86455, type: 3}
