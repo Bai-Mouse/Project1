@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public float speed = 1f;
     public float jumpforce = 50f;
     public float score;
+    public float bulletspeed = 30f;
 
     public GameObject gun,bullet;
     public Rigidbody2D rb;
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     public Camera cam;
     public LayerMask ground;
     bool Jumping,Jumpable;
+    public Eyes[] eyes;
     // Start is called before the first frame update
     void Start()
     {
@@ -34,7 +36,10 @@ public class Player : MonoBehaviour
         Vector2 direction = cam.ScreenToWorldPoint(Input.mousePosition) - gun.transform.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         gun.transform.eulerAngles = new Vector3(0, 0, angle);
-
+        foreach(Eyes e in eyes)
+        {
+            e.SetDirection(direction.normalized);
+        }
 
         if (Mathf.Abs(angle) > 90)
             gun.transform.localScale = new Vector3(1, -1, 1);
@@ -46,7 +51,7 @@ public class Player : MonoBehaviour
             rb.velocity += direction.normalized * -2.3f;
             GameObject b = Instantiate(bullet,gun.transform.position,transform.rotation);
             Bullet bulletscript = b.GetComponent<Bullet>();
-            bulletscript.speed = 30f;
+            bulletscript.speed = bulletspeed;
             bulletscript.Direction = direction.normalized;
             
         }
@@ -69,7 +74,7 @@ public class Player : MonoBehaviour
             Jump();
             Jumpable = false;
         }
-        if (!Jumpable && box.IsTouchingLayers(ground))
+        if (rb.velocity.y <= 0 && !Jumpable && box.IsTouchingLayers(ground))
         {
             Jumpable = true;
         }

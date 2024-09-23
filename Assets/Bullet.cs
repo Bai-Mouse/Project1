@@ -31,7 +31,7 @@ public class Bullet : MonoBehaviour
     {
         if (collision.gameObject.tag == "Collectible")
         {
-            collision.gameObject.GetComponent<Enemy>().gethit(Direction,speed);
+            collision.gameObject.GetComponent<Enemy>().gethit(Direction,speed/3);
             GameObject Player = GameObject.FindGameObjectWithTag("Player");
             Player.GetComponent<Player>().score++;
             
