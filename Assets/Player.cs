@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     public float jumpforce = 50f;
     public float score;
     public float bulletspeed = 30f;
+    public float CameraBuffer = 1;
 
     public GameObject gun,bullet;
     public Rigidbody2D rb;
@@ -30,7 +31,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        cam.transform.position = new Vector3(transform.position.x, transform.position.y,-10);
+
 
 
         Vector2 direction = cam.ScreenToWorldPoint(Input.mousePosition) - gun.transform.position;
@@ -67,7 +68,7 @@ public class Player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        
+        cam.transform.position += new Vector3((transform.position.x - cam.transform.position.x) / CameraBuffer, (transform.position.y - cam.transform.position.y) / CameraBuffer, 0);
         transform.Translate(Dir().x * speed,0,0,Space.World);
         if(Input.GetAxis("Jump") > 0.5f && Jumpable )
         {

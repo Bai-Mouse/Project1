@@ -14,7 +14,7 @@ public class Bullet : MonoBehaviour
     {
         Rigidbody = GetComponent<Rigidbody2D>();
         Rigidbody.velocity = Direction*speed;
-        transform.Translate(Direction.normalized);
+        transform.Translate(Direction.normalized*1.5f);
     }
 
     // Update is called once per frame
@@ -29,13 +29,16 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        GameObject Player = GameObject.FindGameObjectWithTag("Player");
         if (collision.gameObject.tag == "Collectible")
         {
             collision.gameObject.GetComponent<Enemy>().gethit(Direction,speed/3);
-            GameObject Player = GameObject.FindGameObjectWithTag("Player");
-            Player.GetComponent<Player>().score++;
             
+            Player.GetComponent<Player>().score++;
+            Destroy(gameObject);
+
         }
+        
         Destroy(gameObject);
     }
 
