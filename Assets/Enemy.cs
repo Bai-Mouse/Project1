@@ -71,6 +71,7 @@ public class Enemy : MonoBehaviour
         }
         transform.Translate(direction * speed * Time.fixedDeltaTime, 0, 0, Space.World);
         Jump();
+        
     }
     private IEnumerator Die(float waitTime)
     {
@@ -92,6 +93,7 @@ public class Enemy : MonoBehaviour
         
         if (health <= 0)
         {
+            Player.score++;
             spriteRenderer.enabled = false;
             StartCoroutine(Die(0.5f));
         }
@@ -114,5 +116,13 @@ public class Enemy : MonoBehaviour
         }
         
 
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (health <= 0) return;
+        if (collision.gameObject.tag == "Player")
+        {
+            collision.gameObject.GetComponent<Player>().gethit(collision.transform.position-transform.position,20);
+        }
     }
 }

@@ -11,14 +11,19 @@ public class Player : MonoBehaviour
     public float score;
     public float bulletspeed = 30f;
     public float CameraBuffer = 1;
+    float gethittime;
 
     public GameObject gun,bullet;
     public Rigidbody2D rb;
+    SpriteRenderer SpriteRenderer;
+    Color OriginalColor;
     Collider2D box;
     public Camera cam;
     public LayerMask ground;
     bool Jumping,Jumpable;
+    public bool Gethit;
     public Eyes[] eyes;
+    public float health;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +31,9 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         box = GetComponent<Collider2D>();
         Jumpable = true;
+        health = 10;
+        SpriteRenderer = GetComponent<SpriteRenderer>();
+        OriginalColor = SpriteRenderer.color;
     }
 
     // Update is called once per frame
@@ -79,6 +87,23 @@ public class Player : MonoBehaviour
         {
             Jumpable = true;
         }
+        if (gethittime>0)
+        {
+            gethittime -= Time.fixedDeltaTime;
+            SpriteRenderer.color = Color.white;
+            cam.transform.position += new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), 0);
+            if (gethittime <= 0)
+            {
+                SpriteRenderer.color = OriginalColor;
+                Gethit = false;
+                if (health <= 0)
+                {
+                    gameObject.SetActive(false);
+
+                }
+
+            }
+        }
     }
     public Vector3 Dir()
     {
@@ -87,7 +112,19 @@ public class Player : MonoBehaviour
 
         return new Vector3(x, 0, 0);
     }
+    public void gethit(Vector2 d, float s)
+    {
+        
+        //ParticleSystem.Play();
+        health--;
+        gethittime = 0.2f;
+        Gethit = true;
 
-    
-    
+        
+
+        rb.velocity = d * s;
+
+    }
+
+
 }

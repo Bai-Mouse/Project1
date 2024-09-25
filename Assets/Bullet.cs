@@ -34,7 +34,7 @@ public class Bullet : MonoBehaviour
         {
             collision.gameObject.GetComponent<Enemy>().gethit(Direction,speed/3);
             
-            Player.GetComponent<Player>().score++;
+
             Destroy(gameObject);
 
         }
