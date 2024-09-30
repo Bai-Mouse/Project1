@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -23,7 +24,8 @@ public class Player : MonoBehaviour
     bool Jumping,Jumpable;
     public bool Gethit;
     public Eyes[] eyes;
-    public float health;
+    public float health = 20;
+    public Slider slider;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,9 +33,11 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         box = GetComponent<Collider2D>();
         Jumpable = true;
-        health = 10;
+        
         SpriteRenderer = GetComponent<SpriteRenderer>();
         OriginalColor = SpriteRenderer.color;
+        slider.maxValue = health;
+        slider.value = health;
     }
 
     // Update is called once per frame
@@ -119,8 +123,9 @@ public class Player : MonoBehaviour
         health--;
         gethittime = 0.2f;
         Gethit = true;
+        slider.value = health;
 
-        
+
 
         rb.velocity = d * s;
 
