@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        transform.position += new Vector3(0, 100, 0);
         AudioSource = GetComponent<AudioSource>();
         BulletNum = 1;
         BulletCount = 50;
@@ -140,6 +141,7 @@ public class Player : MonoBehaviour
         }
         if (gamemanager.myTimer >= 60)
         {
+            if(health>0)
             gethit(600);
         }
     }
