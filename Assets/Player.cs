@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Unity.VisualScripting;
-using UnityEditor.UIElements;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
     public float score;
     public float bulletspeed = 30f;
     public float CameraBuffer = 1;
+    public int BulletNum, BulletCount;
     float gethittime;
 
     public GameObject gun,bullet;
@@ -25,15 +27,24 @@ public class Player : MonoBehaviour
     public bool Gethit;
     public Eyes[] eyes;
     public float health = 20;
+    public float maxhealth;
     public Slider slider;
+    Gamemanager gamemanager;
+    public GameObject ENDGAME;
+    public AudioClip[] audioClips;
+    public AudioSource AudioSource;
     // Start is called before the first frame update
     void Start()
     {
+        AudioSource = GetComponent<AudioSource>();
+        BulletNum = 1;
+        BulletCount = 50;
+        gamemanager = GameObject.FindObjectOfType<Gamemanager>();
         cam = FindAnyObjectByType<Camera>();
         rb = GetComponent<Rigidbody2D>();
-        box = GetComponent<Collider2D>();
+        box = GetComponent<CircleCollider2D>();
         Jumpable = true;
-        
+        maxhealth = health;
         SpriteRenderer = GetComponent<SpriteRenderer>();
         OriginalColor = SpriteRenderer.color;
         slider.maxValue = health;
@@ -59,13 +70,23 @@ public class Player : MonoBehaviour
         else
             gun.transform.localScale = new Vector3(1, 1, 1);
 
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (BulletCount>0&&Input.GetKeyDown(KeyCode.Mouse0))
         {
+            BulletCount--;
             rb.velocity += direction.normalized * -2.3f;
-            GameObject b = Instantiate(bullet,gun.transform.position,transform.rotation);
-            Bullet bulletscript = b.GetComponent<Bullet>();
-            bulletscript.speed = bulletspeed;
-            bulletscript.Direction = direction.normalized;
+            AudioSource.clip = audioClips[0];
+            AudioSource.Play();
+            for (int i=0; i< BulletNum; i++)
+            {
+
+                GameObject b = Instantiate(bullet, gun.transform.position, transform.rotation);
+                Bullet bulletscript = b.GetComponent<Bullet>();
+                bulletscript.speed = bulletspeed;
+                bulletscript.Direction = direction.normalized;
+                b.transform.Translate(bulletscript.Direction * 1.5f);
+                b.transform.Translate(new Vector2(Mathf.Cos((angle + 90) * Mathf.Deg2Rad), Mathf.Sin((angle + 90) * Mathf.Deg2Rad)) * Random.Range(-0.1f* (BulletNum-1), 0.1f*(BulletNum - 1)));
+
+            }
             
         }
         
@@ -75,6 +96,8 @@ public class Player : MonoBehaviour
     }
     public void Jump()
     {
+        AudioSource.clip = audioClips[4];
+        AudioSource.Play();
         rb.velocity = Vector2.up * jumpforce;
 
     }
@@ -103,10 +126,21 @@ public class Player : MonoBehaviour
                 if (health <= 0)
                 {
                     gameObject.SetActive(false);
-
+                    AudioSource.clip = audioClips[1];
+                    AudioSource.Play();
+                    ENDGAME.SetActive(true);
                 }
 
             }
+        }
+        if(transform.position.y <= -100)
+        {
+
+            gamemanager.NewRoom();
+        }
+        if (gamemanager.myTimer >= 60)
+        {
+            gethit(600);
         }
     }
     public Vector3 Dir()
@@ -124,12 +158,79 @@ public class Player : MonoBehaviour
         gethittime = 0.2f;
         Gethit = true;
         slider.value = health;
+        AudioSource.clip = audioClips[2];
+        AudioSource.Play();
 
-
-
+        if (rb.velocity.y !< -1)
         rb.velocity = d * s;
 
     }
+    public void gethit(float h)
+    {
 
+        //ParticleSystem.Play();
+        health-=h;
+        gethittime = 0.2f;
+        Gethit = true;
+        slider.value = 0;
+        AudioSource.clip = audioClips[2];
+        AudioSource.Play();
+
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Buff")
+        {
+            print(collision.name);
+            switch(collision.name){
+                case "ExtraBullet(Clone)":
+                    BulletCount+=10;
+                    
+                    AudioSource.clip = audioClips[7];
+                    AudioSource.Play();
+                    break;
+                case "ExtraTime(Clone)":
+                    AudioSource.clip = audioClips[5];
+                    AudioSource.Play();
+                    gamemanager.myTimer-=3;
+                    if (gamemanager.myTimer < 0)
+                    {
+                        gamemanager.myTimer = 0;
+                    }
+                        break;
+                case "Health(Clone)":
+                    AudioSource.clip = audioClips[6];
+                    AudioSource.Play();
+                    health +=3;
+                    if (health > maxhealth)
+                    {
+                        health = maxhealth;
+                    }
+                    slider.value = health;
+                    break;
+            }
+            Destroy(collision.gameObject);
+        }
+        
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(rb.velocity.y<-1&& collision.transform.position.y<transform.position.y)
+        if (collision.gameObject.tag == "Collectible")
+        {
+            if (collision.gameObject.GetComponent<Enemy>())
+            {
+                if (collision.gameObject.GetComponent<Enemy>().health <= 0)
+                {
+                    return;
+                }
+                collision.gameObject.GetComponent<Enemy>().gethit(collision.transform.position - transform.position, 5,2);
+                    rb.velocity = Vector2.up * jumpforce/2;
+                    AudioSource.clip = audioClips[3];
+                    AudioSource.Play();
+                }
+
+        }
+    }
 
 }
